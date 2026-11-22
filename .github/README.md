@@ -46,7 +46,7 @@ No web server, database engine, folder configuration, or internet connection req
 ## Quick Start
 
 1. **Place this folder inside your e-books directory**  
-   For example, if your e-books are in `D:\E-Books\Sci-Fi`, `D:\E-Books\History`, etc., place this project folder at `D:\E-Books\index` (or `D:\E-Books\local-ebook-library`).  
+   For example, if your e-books are in `D:\E-Books\Sci-Fi`, `D:\E-Books\History`, etc., place this project folder at `D:\E-Books\index` (or `D:\E-Books\hurkals-local-ebook-library`).  
    `update-index.bat` automatically scans `D:\E-Books` (all sibling folders + inside the project folder itself), skipping `app/`, `.github/`, `.git/`, and `.gitignore`.
 
 2. **Build or update the database**  
