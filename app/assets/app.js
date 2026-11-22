@@ -394,13 +394,15 @@
 
   function getFolderDisplay(book) {
     if (book.rootName && book.subFolder) {
-      return `${book.rootName} / ${book.subFolder.replace(/\\/g, " / ")}`;
+      return `${book.rootName} / ${book.subFolder.replace(/[\\/]/g, " / ")}`;
     }
     return book.rootName || book.folderPath || t("rootFolder");
   }
 
   function getFolderKey(book) {
-    return book.subFolder ? `${book.rootName}\\${book.subFolder}` : (book.rootName || book.folderPath || "");
+    return book.subFolder
+      ? `${book.rootName}/${book.subFolder.replace(/\\/g, "/")}`
+      : (book.rootName || book.folderPath || "");
   }
 
   // Safe match highlighting using DOM nodes (prevents HTML injection)
@@ -585,7 +587,7 @@
     for (const [folderKey, count] of sortedFolders) {
       const opt = document.createElement("option");
       opt.value = folderKey;
-      opt.textContent = `${folderKey.replace(/\\/g, " / ")} (${formatNumber(count)})`;
+      opt.textContent = `${folderKey.replace(/[\\/]/g, " / ")} (${formatNumber(count)})`;
       el.folderFilter.appendChild(opt);
     }
   }
