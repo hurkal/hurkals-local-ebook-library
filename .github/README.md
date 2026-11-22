@@ -4,6 +4,14 @@ Index thousands of e-books spread across multiple local folders into a single JS
 
 No web server, database engine, folder configuration, or internet connection required.
 
+## Screenshots
+
+### Offline Web Interface
+![E-Book Library Web Interface](assets/screenshot-ui.png)
+
+### PowerShell Indexer (`update-index.bat`)
+![PowerShell E-Book Indexer](assets/screenshot-indexer.jpg)
+
 ## Features
 
 - **Zero-configuration automatic scanning**: Place this folder inside your main e-books directory and run `update-index.bat` — it automatically scans every sibling folder at the same level as well as books inside this folder itself (while excluding `app/`, `.github/`, `.git/`, and `.gitignore`).
