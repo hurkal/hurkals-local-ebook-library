@@ -2,11 +2,11 @@
 
 Index thousands of e-books spread across multiple local folders into a single JSON (and optional XML) database using a zero-dependency PowerShell script, then search and browse them instantaneously through an offline HTML/CSS/JavaScript web interface.
 
-No web server, database engine, or internet connection required.
+No web server, database engine, folder configuration, or internet connection required.
 
 ## Features
 
-- **Multi-folder recursive indexing** via PowerShell (compatible with Windows PowerShell 5.1 and PowerShell 7+).
+- **Zero-configuration automatic scanning**: Place this folder inside your main e-books directory and run `update-index.bat` — it automatically scans every sibling folder at the same level as well as books inside this folder itself (while excluding `app/`, `.github/`, `.git/`, and `.gitignore`).
 - **Incremental updates**: Unchanged files reuse cached metadata; only new, modified, or deleted books are processed.
 - **Native EPUB metadata extraction**: Reads title, author, publisher, year, language, tags, and description directly from `.epub` archives without external tools.
 - **Filename parsing fallback**: Extracts author, title, and year from filenames (e.g. `Author - Title (2020).pdf`) for PDF, MOBI, AZW3, DJVU, FB2, CBR/CBZ, TXT, DOCX, and RTF files.
@@ -20,6 +20,7 @@ No web server, database engine, or internet connection required.
 .
 ├── index.html                        # Main offline web interface
 ├── update-index.bat                  # Double-click launcher for Windows
+├── LICENSE                           # MIT License
 ├── .gitignore                        # Git ignore rules
 ├── .github/
 │   └── README.md                     # Documentation (rendered automatically on GitHub)
@@ -28,8 +29,7 @@ No web server, database engine, or internet connection required.
     │   ├── app.js                    # Client-side search, filtering, and i18n logic
     │   └── styles.css                # Responsive light/dark theme stylesheet
     ├── config/
-    │   ├── config.example.json       # Template configuration file
-    │   └── config.json               # Your local folders & settings (gitignored)
+    │   └── config.json               # Supported extensions & excluded folder names
     ├── data/
     │   ├── books.json                # Generated UTF-8 JSON database (gitignored)
     │   └── books.js                  # Generated file:// database bridge (gitignored)
@@ -45,23 +45,15 @@ No web server, database engine, or internet connection required.
 
 ## Quick Start
 
-1. **Configure your folders (optional)**  
-   E-books placed directly inside the project folder (alongside `index.html`) are scanned automatically while excluding `app/`, `.github/`, `.git/`, and `.gitignore`.  
-   To also index external folders, copy `app/config/config.example.json` to `app/config/config.json` (or run `update-index.bat` once to create it automatically) and list your e-book folders (use escaped backslashes `\\`):
-   ```json
-   {
-     "folders": [
-       "C:\\Books",
-       "D:\\E-Books"
-     ]
-   }
-   ```
+1. **Place this folder inside your e-books directory**  
+   For example, if your e-books are in `D:\E-Books\Sci-Fi`, `D:\E-Books\History`, etc., place this project folder at `D:\E-Books\index` (or `D:\E-Books\local-ebook-library`).  
+   `update-index.bat` automatically scans `D:\E-Books` (all sibling folders + inside the project folder itself), skipping `app/`, `.github/`, `.git/`, and `.gitignore`.
 
 2. **Build or update the database**  
    - **Easiest way:** Double-click `update-index.bat`.
    - **PowerShell CLI options:**
      ```powershell
-     # Standard incremental update
+     # Standard incremental update (scans parent directory automatically)
      powershell -ExecutionPolicy Bypass -File .\app\scripts\index-ebooks.ps1
 
      # Also export app/data/books.xml
@@ -73,7 +65,7 @@ No web server, database engine, or internet connection required.
      # Fast filename-only scan (skip reading inside EPUB files)
      powershell -ExecutionPolicy Bypass -File .\app\scripts\index-ebooks.ps1 -Fast
 
-     # Scan specific folders via CLI
+     # Optional: scan custom folders via CLI override
      powershell -ExecutionPolicy Bypass -File .\app\scripts\index-ebooks.ps1 -Folders "C:\Books","D:\PDF"
 
      # Sync language packs only (without scanning books)

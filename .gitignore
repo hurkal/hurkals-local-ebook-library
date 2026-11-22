@@ -1,5 +1,4 @@
-# Local user configuration and generated library databases
-app/config/config.json
+# Generated local library databases
 app/data/books.json
 app/data/books.js
 app/data/books.xml

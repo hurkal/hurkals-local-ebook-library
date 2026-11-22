@@ -3,19 +3,21 @@
     Scans e-book folders and generates/updates a local JSON (and optional XML) library database.
 
 .DESCRIPTION
-    Recursively scans the folders configured in config.json and builds a searchable
-    local e-book database. Uses incremental indexing: unchanged files keep their cached
-    metadata (including EPUB metadata), only new or modified files are parsed, and
-    deleted files are removed.
+    Automatically scans the parent directory containing this project folder (all sibling
+    folders and files) as well as the project folder itself, excluding internal app/,
+    .github/, .git/, and .gitignore directories. Uses incremental indexing: unchanged
+    files keep their cached metadata (including EPUB metadata), only new or modified
+    files are parsed, and deleted files are removed.
 
-    Also generates data/books.js and lang/languages.js bridges so index.html works
+    Also generates app/data/books.js and app/lang/languages.js bridges so index.html works
     directly over the file:// protocol without browser CORS errors or a local server.
 
 .PARAMETER ConfigPath
-    Path to the configuration JSON file. Defaults to app/config/config.json.
+    Path to the configuration JSON file (extensions, excludeFolders, extractEpubMetadata).
+    Defaults to app/config/config.json.
 
 .PARAMETER Folders
-    Overrides the folder list from app/config/config.json via CLI arguments.
+    Optional CLI override to scan specific folders instead of the automatic parent directory.
 
 .PARAMETER Force
     Ignores the existing cache and re-scans metadata for all files from scratch.
@@ -504,23 +506,10 @@ if ($OnlyLang) {
 $defaultExtensions = @(".pdf", ".epub", ".mobi", ".azw", ".azw3", ".djvu", ".fb2", ".cbr", ".cbz", ".txt", ".docx", ".rtf")
 $defaultExcludes = @('$RECYCLE.BIN', "System Volume Information", ".git", ".github", ".gitignore", "node_modules", "AppData")
 $extractEpub = $true
-$targetFolders = @()
-
-# Bootstrap app/config/config.json from app/config/config.example.json on a fresh clone if needed
-if (-not (Test-Path -LiteralPath $ConfigPath) -and -not $Folders) {
-    $exampleConfig = Join-Path (Join-Path $AppDir "config") "config.example.json"
-    if (Test-Path -LiteralPath $exampleConfig) {
-        Copy-Item -LiteralPath $exampleConfig -Destination $ConfigPath
-        Write-Host "Created app/config/config.json from app/config/config.example.json. Edit it to add your e-book folders." -ForegroundColor Yellow
-    }
-}
 
 if (Test-Path -LiteralPath $ConfigPath) {
     $configRaw = Read-Utf8Text -Path $ConfigPath
     $config = $configRaw | ConvertFrom-Json
-    if (-not $Folders -and $config.PSObject.Properties["folders"]) {
-        $targetFolders = @($config.folders)
-    }
     if ($config.PSObject.Properties["extensions"] -and $config.extensions) {
         $defaultExtensions = @($config.extensions)
     }
@@ -530,13 +519,6 @@ if (Test-Path -LiteralPath $ConfigPath) {
     if ($config.PSObject.Properties["extractEpubMetadata"]) {
         $extractEpub = [bool]$config.extractEpubMetadata
     }
-}
-elseif (-not $Folders) {
-    Write-Warning "Configuration file not found: $ConfigPath"
-}
-
-if ($Folders) {
-    $targetFolders = @($Folders)
 }
 
 if ($Fast) {
@@ -605,33 +587,30 @@ $internalSkipDirs = @(
     (Join-Path $ProjectRoot ".gitignore")
 )
 
-# Resolve folders to scan, always including $ProjectRoot (unless already covered by a parent folder or -Folders was explicitly passed)
+# By default, scan the parent directory of $ProjectRoot (covering all sibling directories AND $ProjectRoot itself)
 $foldersToScan = New-Object System.Collections.Generic.List[string]
-foreach ($rawFolder in $targetFolders) {
-    if ([string]::IsNullOrWhiteSpace($rawFolder)) { continue }
-    $resolvedFolder = $rawFolder.Trim().TrimEnd('\')
-    if (-not (Test-Path -LiteralPath $resolvedFolder -PathType Container)) {
-        Write-Warning "Folder not found (skipped): $resolvedFolder"
-        continue
-    }
-    $fullRoot = (Get-Item -LiteralPath $resolvedFolder).FullName.TrimEnd('\')
-    if (-not $foldersToScan.Contains($fullRoot)) {
-        $foldersToScan.Add($fullRoot)
-    }
-}
-
-if (-not $Folders -and (Test-Path -LiteralPath $ProjectRoot -PathType Container)) {
-    $normProjectRoot = (Get-Item -LiteralPath $ProjectRoot).FullName.TrimEnd('\')
-    $alreadyCovered = $false
-    foreach ($existingRoot in $foldersToScan) {
-        if ($normProjectRoot -ieq $existingRoot -or $normProjectRoot.StartsWith(($existingRoot + "\"), [System.StringComparison]::OrdinalIgnoreCase)) {
-            $alreadyCovered = $true
-            break
+if ($Folders) {
+    foreach ($rawFolder in $Folders) {
+        if ([string]::IsNullOrWhiteSpace($rawFolder)) { continue }
+        $resolvedFolder = $rawFolder.Trim().TrimEnd('\')
+        if (-not (Test-Path -LiteralPath $resolvedFolder -PathType Container)) {
+            Write-Warning "Folder not found (skipped): $resolvedFolder"
+            continue
+        }
+        $fullRoot = (Get-Item -LiteralPath $resolvedFolder).FullName.TrimEnd('\')
+        if (-not $foldersToScan.Contains($fullRoot)) {
+            $foldersToScan.Add($fullRoot)
         }
     }
-    if (-not $alreadyCovered) {
-        $foldersToScan.Add($normProjectRoot)
+}
+else {
+    $parentOfProject = Split-Path -Parent $ProjectRoot
+    $autoRoot = if (-not [string]::IsNullOrWhiteSpace($parentOfProject) -and (Test-Path -LiteralPath $parentOfProject -PathType Container)) {
+        (Get-Item -LiteralPath $parentOfProject).FullName.TrimEnd('\')
+    } else {
+        (Get-Item -LiteralPath $ProjectRoot).FullName.TrimEnd('\')
     }
+    $foldersToScan.Add($autoRoot)
 }
 
 Write-Host ""
@@ -835,5 +814,5 @@ if ($ExportXml) {
 
 if ($validScannedFolders.Count -eq 0) {
     Write-Host ""
-    Write-Host "WARNING: No valid folders were found. Update the 'folders' list in config.json with your e-book directories." -ForegroundColor Yellow
+    Write-Host "WARNING: No valid folders were found to scan." -ForegroundColor Yellow
 }

@@ -46,7 +46,7 @@
     resultsTotalSummary: "Showing {total} books",
     loadMore: "Show More ({remaining} books remaining)",
     emptyNoBooksTitle: "No indexed books yet",
-    emptyNoBooksDesc: "Add your e-book folders to app/config/config.json and run update-index.bat (or app/scripts/index-ebooks.ps1). Then refresh this page.",
+    emptyNoBooksDesc: "Place this folder inside your e-books directory and run update-index.bat (or app/scripts/index-ebooks.ps1). Then refresh this page.",
     emptyNoMatchTitle: "No matching books found",
     emptyNoMatchDesc: "Try different keywords or clear the active format/folder filters.",
     loadDemoBtn: "Preview with Sample Library",

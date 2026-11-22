@@ -44,7 +44,7 @@
     "resultsTotalSummary": "Toplam {total} kitap listeleniyor",
     "loadMore": "Daha Fazla Göster ({remaining} kitap kaldı)",
     "emptyNoBooksTitle": "Henüz indekslenmiş kitap yok",
-    "emptyNoBooksDesc": "app/config/config.json dosyasına e-kitap klasörlerinizi ekleyip update-index.bat (veya app/scripts/index-ebooks.ps1) dosyasını çalıştırın. Ardından sayfayı yenileyin.",
+    "emptyNoBooksDesc": "Bu klasörü e-kitaplarınızın bulunduğu dizine koyup update-index.bat (veya app/scripts/index-ebooks.ps1) dosyasını çalıştırın. Ardından sayfayı yenileyin.",
     "emptyNoMatchTitle": "Aramanızla eşleşen kitap bulunamadı",
     "emptyNoMatchDesc": "Farklı anahtar kelimeler deneyin veya aktif format/klasör filtrelerini temizleyin.",
     "loadDemoBtn": "Örnek Kütüphane ile Önizle",
