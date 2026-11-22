@@ -1,0 +1,10 @@
+# Local user configuration and generated library databases
+app/config/config.json
+app/data/books.json
+app/data/books.js
+app/data/books.xml
+
+# OS / Editor files
+.DS_Store
+Thumbs.db
+desktop.ini

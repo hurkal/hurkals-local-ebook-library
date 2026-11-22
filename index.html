@@ -1,0 +1,192 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>E-Book Library</title>
+  <link rel="stylesheet" href="app/assets/styles.css">
+</head>
+<body>
+  <header class="topbar">
+    <div class="container topbar-inner">
+      <div class="brand">
+        <span class="brand-icon" aria-hidden="true">📚</span>
+        <div>
+          <h1 data-i18n="appTitle">E-Book Library</h1>
+          <p class="subtitle" id="dbMeta" data-i18n="loadingDb">Loading local book archive…</p>
+        </div>
+      </div>
+
+      <div class="topbar-actions">
+        <select
+          id="langSelect"
+          class="select-control lang-select"
+          data-i18n-aria-label="langSelectLabel"
+          aria-label="Select language"
+          hidden
+        ></select>
+        <label
+          class="btn btn-ghost"
+          for="jsonFileInput"
+          data-i18n="loadJson"
+          data-i18n-title="loadJsonTitle"
+          title="Manually load a different books.json file"
+        >
+          📂 Load JSON
+        </label>
+        <input type="file" id="jsonFileInput" accept=".json,application/json" hidden>
+        <button
+          type="button"
+          id="themeToggle"
+          class="btn btn-ghost"
+          data-i18n-aria-label="themeToggleAria"
+          data-i18n-title="themeToggleTitle"
+          aria-label="Toggle theme"
+          title="Light / Dark Theme"
+        >
+          🌙 Dark
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <main class="container">
+    <!-- Statistics Bar -->
+    <section class="stats-bar" data-i18n-aria-label="statsAria" aria-label="Library statistics">
+      <div class="stat-card">
+        <span class="stat-label" data-i18n="statTotal">Total Books</span>
+        <strong class="stat-value" id="statTotal">0</strong>
+      </div>
+      <div class="stat-card">
+        <span class="stat-label" data-i18n="statFiltered">Showing</span>
+        <strong class="stat-value" id="statFiltered">0</strong>
+      </div>
+      <div class="stat-card">
+        <span class="stat-label" data-i18n="statSize">Total Size</span>
+        <strong class="stat-value" id="statSize">0 MB</strong>
+      </div>
+      <div class="stat-card">
+        <span class="stat-label" data-i18n="statFolders">Folders</span>
+        <strong class="stat-value" id="statFolders">0</strong>
+      </div>
+    </section>
+
+    <!-- Search & Filter Panel -->
+    <section class="controls-panel" data-i18n-aria-label="controlsAria" aria-label="Search and filtering">
+      <div class="search-row">
+        <div class="search-box">
+          <span class="search-icon" aria-hidden="true">🔍</span>
+          <input
+            type="search"
+            id="searchInput"
+            data-i18n-placeholder="searchPlaceholder"
+            data-i18n-aria-label="searchAria"
+            placeholder="Search by title, author, filename, folder, or publisher… (Shortcut: /)"
+            autocomplete="off"
+            aria-label="Search e-books"
+          >
+          <button
+            type="button"
+            id="clearSearchBtn"
+            class="clear-btn"
+            data-i18n-aria-label="clearSearchAria"
+            aria-label="Clear search"
+            hidden
+          >✕</button>
+        </div>
+
+        <select id="folderFilter" class="select-control" data-i18n-aria-label="folderFilterAria" aria-label="Filter by folder">
+          <option value="">All Folders</option>
+        </select>
+
+        <select id="sortSelect" class="select-control" data-i18n-aria-label="sortAria" aria-label="Sort by">
+          <option value="title-asc" data-i18n="sortTitleAsc">Title (A → Z)</option>
+          <option value="title-desc" data-i18n="sortTitleDesc">Title (Z → A)</option>
+          <option value="author-asc" data-i18n="sortAuthorAsc">Author (A → Z)</option>
+          <option value="modified-desc" data-i18n="sortModifiedDesc">Recently Modified</option>
+          <option value="added-desc" data-i18n="sortAddedDesc">Recently Added</option>
+          <option value="size-desc" data-i18n="sortSizeDesc">Size (Largest First)</option>
+          <option value="size-asc" data-i18n="sortSizeAsc">Size (Smallest First)</option>
+          <option value="ext-asc" data-i18n="sortExtAsc">Format (A → Z)</option>
+        </select>
+
+        <div class="view-toggle" role="group" data-i18n-aria-label="viewModeAria" aria-label="View mode">
+          <button type="button" id="viewGridBtn" class="icon-btn active" data-i18n-title="viewGridTitle" title="Grid view" aria-pressed="true">⊞</button>
+          <button type="button" id="viewListBtn" class="icon-btn" data-i18n-title="viewListTitle" title="List view" aria-pressed="false">☰</button>
+        </div>
+      </div>
+
+      <div class="format-bar" id="formatPills" role="group" data-i18n-aria-label="formatFilterAria" aria-label="Format filter"></div>
+    </section>
+
+    <!-- Active Filter Summary -->
+    <div class="results-toolbar" id="resultsToolbar" hidden>
+      <span id="resultsSummary"></span>
+      <button type="button" id="resetFiltersBtn" class="link-btn" data-i18n="resetFilters">Reset Filters</button>
+    </div>
+
+    <!-- Results Container -->
+    <section id="resultsContainer" class="results-grid" aria-live="polite"></section>
+
+    <!-- Pagination -->
+    <div class="load-more-wrap" id="loadMoreWrap" hidden>
+      <button type="button" id="loadMoreBtn" class="btn btn-primary">Show More</button>
+    </div>
+
+    <!-- Empty / Setup State -->
+    <section id="emptyState" class="empty-state" hidden>
+      <div class="empty-icon" aria-hidden="true">📖</div>
+      <h2 id="emptyTitle" data-i18n="emptyNoBooksTitle">No indexed books yet</h2>
+      <p id="emptyDesc" data-i18n="emptyNoBooksDesc">
+        Add your e-book folders to app/config/config.json and run update-index.bat (or app/scripts/index-ebooks.ps1). Then refresh this page.
+      </p>
+      <div class="empty-actions">
+        <button type="button" id="loadDemoBtn" class="btn btn-primary" data-i18n="loadDemoBtn">Preview with Sample Library</button>
+        <button type="button" id="emptyResetBtn" class="btn btn-ghost" data-i18n="clearSearchBtn" hidden>Clear Search</button>
+      </div>
+    </section>
+  </main>
+
+  <!-- Book Details Modal -->
+  <dialog id="bookDialog" class="book-dialog" aria-labelledby="dialogTitle">
+    <div class="dialog-header">
+      <div>
+        <span class="badge" id="dialogBadge">PDF</span>
+        <h2 id="dialogTitle">Book Title</h2>
+        <p class="dialog-author" id="dialogAuthor"></p>
+      </div>
+      <button type="button" id="closeDialogBtn" class="icon-btn" data-i18n-aria-label="dialogCloseAria" aria-label="Close">✕</button>
+    </div>
+
+    <div class="dialog-body">
+      <dl class="meta-grid" id="dialogMeta"></dl>
+      <div id="dialogTagsWrap" class="dialog-section" hidden>
+        <h3 data-i18n="dialogTags">Tags</h3>
+        <div id="dialogTags" class="tag-list"></div>
+      </div>
+      <div id="dialogDescWrap" class="dialog-section" hidden>
+        <h3 data-i18n="dialogDescription">Description</h3>
+        <p id="dialogDesc" class="dialog-desc"></p>
+      </div>
+      <div class="dialog-section">
+        <h3 data-i18n="dialogLocation">File Location</h3>
+        <code id="dialogPath" class="path-box"></code>
+      </div>
+    </div>
+
+    <div class="dialog-footer">
+      <a id="dialogOpenLink" href="#" target="_blank" rel="noopener" class="btn btn-primary" data-i18n="dialogOpenFile">Open File</a>
+      <button type="button" id="copyFilePathBtn" class="btn btn-ghost" data-i18n="dialogCopyFilePath">Copy File Path</button>
+      <button type="button" id="copyFolderPathBtn" class="btn btn-ghost" data-i18n="dialogCopyFolderPath">Copy Folder Path</button>
+    </div>
+  </dialog>
+
+  <!-- Toast Notification -->
+  <div id="toast" class="toast" role="status" aria-live="polite" hidden></div>
+
+  <!-- Auto-generated local bridges for file:// compatibility -->
+  <script src="app/lang/languages.js"></script>
+  <script src="app/data/books.js"></script>
+  <script src="app/assets/app.js"></script>
+</body>
+</html>

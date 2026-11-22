@@ -1,0 +1,99 @@
+{
+    "languages":  [
+                      {
+                          "code":  "ar",
+                          "name":  "العربية",
+                          "file":  "ar.json"
+                      },
+                      {
+                          "code":  "bg",
+                          "name":  "БЪЛГАРСКИ",
+                          "file":  "bg.json"
+                      },
+                      {
+                          "code":  "bn",
+                          "name":  "বাংলা",
+                          "file":  "bn.json"
+                      },
+                      {
+                          "code":  "de",
+                          "name":  "DEUTSCH",
+                          "file":  "de.json"
+                      },
+                      {
+                          "code":  "el",
+                          "name":  "ΕΛΛΗΝΙΚΑ",
+                          "file":  "el.json"
+                      },
+                      {
+                          "code":  "en",
+                          "name":  "ENGLISH",
+                          "file":  "en.json"
+                      },
+                      {
+                          "code":  "es",
+                          "name":  "ESPAÑOL",
+                          "file":  "es.json"
+                      },
+                      {
+                          "code":  "fr",
+                          "name":  "FRANÇAIS",
+                          "file":  "fr.json"
+                      },
+                      {
+                          "code":  "hi",
+                          "name":  "हिन्दी",
+                          "file":  "hi.json"
+                      },
+                      {
+                          "code":  "it",
+                          "name":  "ITALIANO",
+                          "file":  "it.json"
+                      },
+                      {
+                          "code":  "ja",
+                          "name":  "日本語",
+                          "file":  "ja.json"
+                      },
+                      {
+                          "code":  "ko",
+                          "name":  "한국어",
+                          "file":  "ko.json"
+                      },
+                      {
+                          "code":  "pt",
+                          "name":  "PORTUGUÊS",
+                          "file":  "pt.json"
+                      },
+                      {
+                          "code":  "ru",
+                          "name":  "РУССКИЙ",
+                          "file":  "ru.json"
+                      },
+                      {
+                          "code":  "tr",
+                          "name":  "TÜRKÇE",
+                          "file":  "tr.json"
+                      },
+                      {
+                          "code":  "uk",
+                          "name":  "УКРАЇНСЬКА",
+                          "file":  "uk.json"
+                      },
+                      {
+                          "code":  "ur",
+                          "name":  "اردو",
+                          "file":  "ur.json"
+                      },
+                      {
+                          "code":  "zh-cn",
+                          "name":  "简体中文",
+                          "file":  "zh-cn.json"
+                      },
+                      {
+                          "code":  "zh-tw",
+                          "name":  "繁體中文",
+                          "file":  "zh-tw.json"
+                      }
+                  ]
+}

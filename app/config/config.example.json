@@ -1,0 +1,30 @@
+{
+  "folders": [
+    "C:\\Books",
+    "D:\\E-Books"
+  ],
+  "extensions": [
+    ".pdf",
+    ".epub",
+    ".mobi",
+    ".azw",
+    ".azw3",
+    ".djvu",
+    ".fb2",
+    ".cbr",
+    ".cbz",
+    ".txt",
+    ".docx",
+    ".rtf"
+  ],
+  "excludeFolders": [
+    "$RECYCLE.BIN",
+    "System Volume Information",
+    ".git",
+    ".github",
+    ".gitignore",
+    "node_modules",
+    "AppData"
+  ],
+  "extractEpubMetadata": true
+}
